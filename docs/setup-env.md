@@ -49,3 +49,26 @@ Maven order of execution:
 > verify - run any checks on results of integration tests to ensure quality criteria are met
 > install - install the package into the local repository, for use as a dependency in other projects locally
 > deploy - done in the build environment, copies the final package to the remote repository for sharing with other developers and projects.
+
+
+### Create a project example
+
+* Perform the `mvn archetype:generate` step describe in:
+  https://maven.apache.org/guides/getting-started/maven-in-five-minutes.html
+
+* Update java version in pom
+  https://maven.apache.org/guides/getting-started/maven-in-five-minutes.html#java-9-or-later
+
+* Add deps
+  https://undertow.io/undertow-docs/undertow-docs-2.1.0/index.html#introduction-to-undertow
+  <dependency>
+     <groupId>io.undertow</groupId>
+     <artifactId>undertow-core</artifactId>
+     <version>2.2.7.Final</version>
+  </dependency>
+
+* Build
+`mvn package`
+
+* Run
+`mvn exec:java -Dexec.mainClass=xx`
