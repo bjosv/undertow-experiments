@@ -20,6 +20,7 @@ import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.UnrecoverableKeyException;
 import java.security.cert.CertificateException;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.net.ssl.KeyManager;
 import javax.net.ssl.KeyManagerFactory;
@@ -38,6 +39,8 @@ public class App {
     private Undertow server;
     private GracefulShutdownHandler shutdownHandler;
 
+    private AtomicInteger atomicCounter = new AtomicInteger(0);
+
     public static void main(final String[] args) {
 
         // NOT WORKING!?
@@ -50,14 +53,18 @@ public class App {
         app.createServer();
 
         try {
-            Thread.sleep(10000);
+            int i = 2;
+            while (i > 0) {
+                System.out.printf("Server stopped in %ds...\n", i);
+                Thread.sleep(1000);
+                i--;
+            }
         } catch (Exception e) {
             System.out.println(e);
         }
 
-        LOGGER.info(">>> Stop server");
         app.stop();
-        LOGGER.info(">>> Stop server - DONE");
+        LOGGER.info(">>> Exit");
     }
 
     public void createServer() {
@@ -71,13 +78,14 @@ public class App {
         HttpHandler requestHandler = new HttpHandler() {
             @Override
             public void handleRequest(final HttpServerExchange exchange) throws Exception {
-                LOGGER.info(">>> Handle request from: " + exchange.getConnection().getPeerAddress().toString());
+                LOGGER.infof(">>> Handle request %d from: %s\n",
+                             atomicCounter.incrementAndGet(),
+                             exchange.getConnection().getPeerAddress().toString());
                 if (!exchange.getProtocol().equals(Protocols.HTTP_2_0)) {
                     throw new RuntimeException("Not HTTP/2");
                 }
-                LOGGER.infof(">>> isPersistent() = %b", exchange.isPersistent());
                 exchange.getResponseHeaders().put(Headers.CONTENT_TYPE, "text/plain");
-                exchange.getResponseSender().send("Hello World");
+                exchange.getResponseSender().send("Hello Request "+atomicCounter.get());
             }
         };
         shutdownHandler = Handlers.gracefulShutdown(requestHandler);
@@ -99,20 +107,16 @@ public class App {
     }
 
     public void stop() {
-        LOGGER.info(">>> STOP called");
-
-        LOGGER.info(">>> CALL shutdown");
+        LOGGER.infof(">>> Initiating shutdown after %d requests\n", atomicCounter.get());
         shutdownHandler.shutdown();
 
-        LOGGER.info(">>> CALL await shutdown");
         try {
             shutdownHandler.awaitShutdown(6000);
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
-        LOGGER.info(">>> CALL await shutdown - DONE");
 
-        LOGGER.info(">>> CALL stop server");
+        LOGGER.infof(">>> Forced stop after %d requests\n", atomicCounter.get());
         server.stop();
     }
 

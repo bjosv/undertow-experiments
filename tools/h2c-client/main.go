@@ -10,7 +10,7 @@ import (
 	"golang.org/x/net/http2"
 )
 
-const url = "http://localhost:7777"
+const url = "http://localhost:7777/test"
 
 func main() {
 	{
@@ -23,56 +23,20 @@ func main() {
 			},
 		}
 
-		// GET
-		{
-			resp, err := client.Get(url)
-			if err != nil {
-				log.Fatalf("error get: %+v", err)
+		for i := 0; i < 1000; i++ {
+			// GET
+			{
+				resp, err := client.Get(url)
+				if err != nil {
+					log.Fatalf("error get: %+v", err)
+				}
+				log.Printf("status=%d\n", resp.StatusCode)
+
+				defer resp.Body.Close()
 			}
-			log.Printf("status=%d\n", resp.StatusCode)
-
-			defer resp.Body.Close()
+			//time.Sleep(1 * time.Millisecond)
 		}
-
-		time.Sleep(1 * time.Second)
-
-		// GET
-		{
-			resp, err := client.Get(url)
-			if err != nil {
-				log.Fatalf("error get: %+v", err)
-			}
-			log.Printf("status=%d\n", resp.StatusCode)
-
-			defer resp.Body.Close()
-		}
-
-		time.Sleep(8 * time.Second)
-
-		// GET
-		{
-			resp, err := client.Get(url)
-			if err != nil {
-				log.Fatalf("error get: %+v", err)
-			}
-			log.Printf("status=%d\n", resp.StatusCode)
-
-			defer resp.Body.Close()
-		}
-
-		//client.CloseIdleConnections()
 	}
-	// time.Sleep(4 * time.Second)
-	// {
-	// 	client := http.Client{
-	// 		Transport: &http2.Transport{
-	// 			AllowHTTP: true,
-	// 			DialTLS: func(network, addr string, cfg *tls.Config) (net.Conn, error) {
-	// 				return net.Dial(network, addr)
-	// 			},
-	// 		},
-	// 	}
-
 	// 	// GET
 	// 	{
 	// 		resp, err := client.Get(url)
@@ -83,8 +47,13 @@ func main() {
 
 	// 		defer resp.Body.Close()
 	// 	}
-	// }
-	log.Printf("Sleep..\n")
-	time.Sleep(20 * time.Second)
-	log.Printf("Sleep.. done\n")
+
+	// 	time.Sleep(1 * time.Second)
+
+	// 	//client.CloseIdleConnections()
+
+	waitTime := 20 * time.Second
+	log.Printf("Wait %s before exiting..\n", waitTime)
+	time.Sleep(waitTime)
+	log.Printf("Exiting..\n")
 }
