@@ -2,6 +2,7 @@ package tech.est.simpleserver;
 
 import io.undertow.Handlers;
 import io.undertow.Undertow;
+import io.undertow.Undertow.ListenerInfo;
 import io.undertow.UndertowOptions;
 import io.undertow.server.HttpHandler;
 import io.undertow.server.HttpServerExchange;
@@ -20,6 +21,7 @@ import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.UnrecoverableKeyException;
 import java.security.cert.CertificateException;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.net.ssl.KeyManager;
@@ -53,7 +55,7 @@ public class App {
         app.createServer();
 
         try {
-            int i = 2;
+            int i = 10;
             while (i > 0) {
                 System.out.printf("Server stopped in %ds...\n", i);
                 Thread.sleep(1000);
@@ -107,6 +109,12 @@ public class App {
     }
 
     public void stop() {
+        List<ListenerInfo> listeners = server.getListenerInfo();
+        for (ListenerInfo listener : listeners) {
+            LOGGER.infof(">>> Stop listening for new connections %s\n", listener);
+            listener.stop();
+        }
+
         LOGGER.infof(">>> Initiating shutdown after %d requests\n", atomicCounter.get());
         shutdownHandler.shutdown();
 

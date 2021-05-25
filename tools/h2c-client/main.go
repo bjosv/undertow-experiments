@@ -23,12 +23,12 @@ func main() {
 			},
 		}
 
-		for i := 0; i < 1000; i++ {
+		for i := 0; i < 10000; i++ {
 			// GET
 			{
 				resp, err := client.Get(url)
 				if err != nil {
-					log.Fatalf("error get: %+v", err)
+					log.Fatalf("EXIT: error during get: %+v", err)
 				}
 				log.Printf("status=%d\n", resp.StatusCode)
 

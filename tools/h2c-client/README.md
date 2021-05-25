@@ -5,7 +5,7 @@ Simple plaintext HTTP/2 client for manual tests of graceful server shutdown usin
 ## Build and run
 
 ```
-env GODEBUG=http2debug=2 go run main.go
+env GODEBUG=http2debug=1 go run main.go
 ```
 
 Levels:
