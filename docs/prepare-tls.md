@@ -42,6 +42,26 @@ keytool -list -keystore /usr/lib/jvm/java-11-openjdk-amd64/lib/security/cacerts
 
 (which points to /etc/ssl/certs/java/cacerts)
 
+### Debug with Wireshark
+Download extract-tls-secrets-4.0.0.jar from:
+https://github.com/neykov/extract-tls-secrets
+
+Configure Wireshark to point to the produced keyfile during a run:
+`Preferences > Protocols > TLS > (Pre)-Master-Secret log filename.`
+
+#### Produce secrets during manual runs
+Set:
+```
+export MAVEN_OPTS=-javaagent:$HOME/Downloads/extract-tls-secrets-4.0.0.jar=/tmp/secrets.log
+```
+
+#### Produce secrets during test runs using Maven (sunfire)
+Add to pom.xml:
+```
+   <properties>
+      <surefire.system.args>-javaagent:/home/bjorn/Downloads/extract-tls-secrets-4.0.0.jar=/tmp/secrets.log</surefire.system.args>
+   </properties>
+```
 
 ### Optional: Generate with openssl and keytool
 https://unix.stackexchange.com/questions/347116/how-to-create-keystore-and-truststore-using-self-signed-certificate
