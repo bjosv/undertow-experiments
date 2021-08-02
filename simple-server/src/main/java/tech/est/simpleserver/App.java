@@ -55,6 +55,14 @@ public class App {
         app.createServer();
 
         try {
+            if (args.length == 1) {
+                if (args[0].equals("-c")) {
+                    while (true) {
+                        Thread.sleep(1000);
+                    }
+                }
+            }
+
             int i = 10;
             while (i > 0) {
                 System.out.printf("Server stopped in %ds...\n", i);
@@ -93,17 +101,18 @@ public class App {
         shutdownHandler = Handlers.gracefulShutdown(requestHandler);
 
         // h2 without TLS/SSL
+        // server = Undertow.builder()
+        //     .setServerOption(UndertowOptions.ENABLE_HTTP2, true)
+        //     .setServerOption(UndertowOptions.SHUTDOWN_TIMEOUT, 10000)
+        //     .addHttpListener(PORT, HOST)
+        //     .setHandler(shutdownHandler).build();
+
+        // h2 with TLS/SSL only
         server = Undertow.builder()
             .setServerOption(UndertowOptions.ENABLE_HTTP2, true)
             .setServerOption(UndertowOptions.SHUTDOWN_TIMEOUT, 10000)
-            .addHttpListener(PORT, HOST)
+            .addHttpsListener(PORT, HOST, sslContext)
             .setHandler(shutdownHandler).build();
-
-        // // h2 with TLS/SSL only
-        // server = Undertow.builder().setServerOption(UndertowOptions.ENABLE_HTTP2,
-        // true)
-        // .addHttpsListener(PORT, HOST,
-        // sslContext).setHandler(shutdownHandler).build();
 
         server.start();
     }
