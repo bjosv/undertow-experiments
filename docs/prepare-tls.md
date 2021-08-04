@@ -1,21 +1,25 @@
 # Prepare for using TLS in Undertow server
 
-### Generating a self-signed certificate (keystore)
+- a keystore typically holds onto certificates that identify us
+- a truststore holds onto certificates that identify others
+
+## Generate
+cd simple-server/src/main/resources
+
+### Generating a self-signed certificate (to server.keystore)
 keytool -genkey -alias ssl -keyalg RSA -keysize 2048 -dname "CN=simpleserver.est.tech,OU=IT,O=EST" -keystore server.keystore -storepass password -keypass password
 
 #### Inspect keystore
 keytool -list -keystore server.keystore
 
-#### Export the cert incl. public key
+### Export the cert incl. public key (to server.cer)
 keytool -exportcert -keystore server.keystore -alias ssl -storepass password -file server.cer
 
 ### Create a truststore containing self-signed cert
 keytool -importcert -keystore server.truststore -alias ssl -storepass password -file server.cer -noprompt
 
-
-#### Move keystores to under src/main/resources/
-https://stackoverflow.com/questions/16374235/resources-and-config-loading-in-maven-project
-
+Build to include keystore in jar files
+See: https://stackoverflow.com/questions/16374235/resources-and-config-loading-in-maven-project
 
 
 ## Other info related to TLS
